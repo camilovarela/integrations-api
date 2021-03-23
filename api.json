@@ -1,0 +1,361 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "Integration API",
+        "version": "1.0.0",
+        "contact": {
+            "email": "hernan.tenjo@mercadolibre.com.co"
+        }
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8080",
+            "description": "Local Environment"
+        }
+    ],
+    "paths": {
+        "/payment_intents/devices": {
+            "get": {
+                "tags": [
+                    "PaymentIntent"
+                ],
+                "parameters": [
+                    {
+                        "name": "store_id",
+                        "description": "Physical place related to the customer",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "in": "query",
+                        "required": false
+                    },
+                    {
+                        "name": "cash_register_id",
+                        "description": "Where the client going to pay",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "in": "query",
+                        "required": false
+                    },
+                    {
+                        "name": "page",
+                        "description": "If there are multiples items the client can/should paginate the results",
+                        "schema": {
+                            "type": "number"
+                        },
+                        "in": "query",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeviceCollection"
+                                },
+                                "example": [
+                                    {
+                                        "id": "1234567890",
+                                        "name": "Device 1",
+                                        "status": "BUSY"
+                                    },
+                                    {
+                                        "id": "1111111",
+                                        "name": "Device 2",
+                                        "status": "FREE"
+                                    }
+                                ]
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unathorized"
+                    }
+                },
+                "description": "List all devices related to the authenticated user allowing to identify available devices to pay"
+            }
+        },
+        "/payment_intents": {
+            "post": {
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PaymentIntentItem"
+                            },
+                            "example": {
+                                "device_id": "ASDF-12345678",
+                                "description": "Some tx detail",
+                                "amount": 1500000,
+                                "currency": "COP",
+                                "country": "CO",
+                                "payment_method_type": "credit_card",
+                                "installments": "10",
+                                "external_reference": "SAP-ID-12345678"
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "PaymentIntent"
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaymentIntentItem"
+                                }
+                            }
+                        },
+                        "description": "The created payment intent."
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unathorized"
+                    }
+                },
+                "description": "Create a new payment intent"
+            }
+        },
+        "/payment_intents/{id}": {
+            "delete": {
+                "tags": [
+                    "PaymentIntent"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "description": "Unique payment intent identifier",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaymentIntentItem"
+                                },
+                                "example": {
+                                    "id": 11111,
+                                    "caller_id": 12345678,
+                                    "device_id": "ASDF-12345678",
+                                    "description": "Some tx detail",
+                                    "amount": 1500000,
+                                    "currency": "COP",
+                                    "country": "CO",
+                                    "payment_method_type": "credit_card",
+                                    "installments": "10",
+                                    "status": "CANCELED",
+                                    "external_reference": "SAP-ID-12345678",
+                                    "created_on": "2021-03-03T10:10:10Z",
+                                    "updated_on": ""
+                                }
+                            }
+                        },
+                        "description": "Payment intent canceled"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unathorized"
+                    }
+                },
+                "description": "Cancel an available payment intent"
+            }
+        },
+        "/devices/{device_id}/payment_intents": {
+            "get": {
+                "tags": [
+                    "Devices"
+                ],
+                "parameters": [
+                    {
+                        "name": "device_id",
+                        "description": "Unique device identifier",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaymentIntentCollection"
+                                },
+                                "example": {
+                                    "payment_intents": [
+                                        {
+                                            "id": 11111,
+                                            "caller_id": 12345678,
+                                            "device_id": "ASDF-12345678",
+                                            "description": "Some tx detail",
+                                            "amount": 1500000,
+                                            "currency": "COP",
+                                            "country": "CO",
+                                            "payment_method_type": "credit_card",
+                                            "installments": "10",
+                                            "status": "OPEN",
+                                            "external_reference": "SAP-ID-12345678",
+                                            "created_on": "2021-03-03T10:10:10Z",
+                                            "updated_on": ""
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unathorized"
+                    }
+                },
+                "description": "Returns payment intents related to the given device ready to be processed"
+            }
+        },
+        "/devices/{device_id}/payment_intents/{payment_intent_id}": {
+            "post": {
+                "tags": [
+                    "Devices"
+                ],
+                "parameters": [
+                    {
+                        "name": "device_id",
+                        "description": "Unique device identifier",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "name": "payment_intent_id",
+                        "description": "Unique payment intent identifier",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The payment is now in queued state"
+                    }
+                },
+                "description": "The device confirms the payment to be processed"
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "DeviceCollection": {
+                "type": "object",
+                "properties": {
+                    "devices": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DeviceItem"
+                        }
+                    }
+                }
+            },
+            "DeviceItem": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    }
+                }
+            },
+            "PaymentIntentCollection": {
+                "type": "object",
+                "properties": {
+                    "payment_intents": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PaymentIntentItem"
+                        }
+                    }
+                }
+            },
+            "PaymentIntentItem": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "number"
+                    },
+                    "caller_id": {
+                        "type": "number"
+                    },
+                    "device_id": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "amount": {
+                        "type": "number"
+                    },
+                    "currency": {
+                        "type": "string"
+                    },
+                    "country": {
+                        "type": "string"
+                    },
+                    "payment_method_type": {
+                        "type": "string"
+                    },
+                    "installments": {
+                        "type": "number"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "external_reference": {
+                        "type": "string"
+                    },
+                    "created_on": {
+                        "type": "string"
+                    },
+                    "updated_on": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "PaymentIntent",
+            "description": "Operations from Integrator"
+        }
+    ]
+}
