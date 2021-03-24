@@ -14,7 +14,92 @@
         }
     ],
     "paths": {
-        "/payment_intents/devices": {
+        "/payment_intents/{id}": {
+            "delete": {
+                "tags": [
+                    "PaymentIntent"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "description": "Unique payment intent identifier",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaymentIntentItem"
+                                },
+                                "example": {
+                                    "id": 11111,
+                                    "caller_id": 12345678,
+                                    "device_id": "ASDF-12345678",
+                                    "description": "Some tx detail",
+                                    "amount": 1500000,
+                                    "currency": "COP",
+                                    "country": "CO",
+                                    "payment_method_type": "credit_card",
+                                    "installments": "10",
+                                    "status": "CANCELED",
+                                    "external_reference": "SAP-ID-12345678",
+                                    "created_on": "2021-03-03T10:10:10Z",
+                                    "updated_on": ""
+                                }
+                            }
+                        },
+                        "description": "Payment intent canceled"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unathorized"
+                    }
+                },
+                "description": "Cancel an available payment intent"
+            }
+        },
+        "/devices/{device_id}/payment_intents/{payment_intent_id}": {
+            "post": {
+                "tags": [
+                    "Devices"
+                ],
+                "parameters": [
+                    {
+                        "name": "device_id",
+                        "description": "Unique device identifier",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "name": "payment_intent_id",
+                        "description": "Unique payment intent identifier",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The payment is now in queued state"
+                    }
+                },
+                "description": "The device confirms the payment to be processed"
+            }
+        },
+        "/devices": {
             "get": {
                 "tags": [
                     "PaymentIntent"
@@ -90,7 +175,6 @@
                                 "$ref": "#/components/schemas/PaymentIntentItem"
                             },
                             "example": {
-                                "device_id": "ASDF-12345678",
                                 "description": "Some tx detail",
                                 "amount": 1500000,
                                 "currency": "COP",
@@ -126,58 +210,6 @@
                 "description": "Create a new payment intent"
             }
         },
-        "/payment_intents/{id}": {
-            "delete": {
-                "tags": [
-                    "PaymentIntent"
-                ],
-                "parameters": [
-                    {
-                        "name": "id",
-                        "description": "Unique payment intent identifier",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/PaymentIntentItem"
-                                },
-                                "example": {
-                                    "id": 11111,
-                                    "caller_id": 12345678,
-                                    "device_id": "ASDF-12345678",
-                                    "description": "Some tx detail",
-                                    "amount": 1500000,
-                                    "currency": "COP",
-                                    "country": "CO",
-                                    "payment_method_type": "credit_card",
-                                    "installments": "10",
-                                    "status": "CANCELED",
-                                    "external_reference": "SAP-ID-12345678",
-                                    "created_on": "2021-03-03T10:10:10Z",
-                                    "updated_on": ""
-                                }
-                            }
-                        },
-                        "description": "Payment intent canceled"
-                    },
-                    "400": {
-                        "description": "Bad request"
-                    },
-                    "401": {
-                        "description": "Unathorized"
-                    }
-                },
-                "description": "Cancel an available payment intent"
-            }
-        },
         "/devices/{device_id}/payment_intents": {
             "get": {
                 "tags": [
@@ -206,7 +238,6 @@
                                         {
                                             "id": 11111,
                                             "caller_id": 12345678,
-                                            "device_id": "ASDF-12345678",
                                             "description": "Some tx detail",
                                             "amount": 1500000,
                                             "currency": "COP",
@@ -232,9 +263,7 @@
                     }
                 },
                 "description": "Returns payment intents related to the given device ready to be processed"
-            }
-        },
-        "/devices/{device_id}/payment_intents/{payment_intent_id}": {
+            },
             "post": {
                 "tags": [
                     "Devices"
@@ -248,23 +277,45 @@
                         },
                         "in": "path",
                         "required": true
-                    },
-                    {
-                        "name": "payment_intent_id",
-                        "description": "Unique payment intent identifier",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "in": "path",
-                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "The payment is now in queued state"
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaymentIntentCollection"
+                                },
+                                "example": {
+                                    "payment_intents": [
+                                        {
+                                            "id": 11111,
+                                            "caller_id": 12345678,
+                                            "description": "Some tx detail",
+                                            "amount": 1500000,
+                                            "currency": "COP",
+                                            "country": "CO",
+                                            "payment_method_type": "credit_card",
+                                            "installments": "10",
+                                            "status": "OPEN",
+                                            "external_reference": "SAP-ID-12345678",
+                                            "created_on": "2021-03-03T10:10:10Z",
+                                            "updated_on": ""
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "401": {
+                        "description": "Unathorized"
                     }
                 },
-                "description": "The device confirms the payment to be processed"
+                "description": "Create a payment intent associated to a particular device"
             }
         }
     },
