@@ -317,6 +317,9 @@
                 },
                 "description": "Create a payment intent associated to a particular device"
             }
+        },
+        "/ping": {
+
         }
     },
     "components": {
